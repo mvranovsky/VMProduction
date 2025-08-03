@@ -1,3 +1,0 @@
-/home/michal/Desktop/STAR/JPsiPhotoproduction/VMProduction/build/CMakeFiles/VMProduction.dir
-/home/michal/Desktop/STAR/JPsiPhotoproduction/VMProduction/build/CMakeFiles/edit_cache.dir
-/home/michal/Desktop/STAR/JPsiPhotoproduction/VMProduction/build/CMakeFiles/rebuild_cache.dir
