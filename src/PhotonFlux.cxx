@@ -65,3 +65,15 @@ double PhotonFlux::getJackson(double x){
     double val = alpha/(M_PI*x) * (2*Y*K0*K1 - pow(Y,2) * ( pow(K1, 2) - pow(K0, 2) ) ); 
     return val;
 }
+
+double PhotonFlux::getJackson(double x, double b){
+    // same as previous Jackson, although before integration over db^2
+
+    double gamma = getLorentzFactor();
+    double omega = omegaFromX(x);
+    double K0 = gsl_sf_bessel_K0(b*omega/gamma);
+    double K1 = gsl_sf_bessel_K1(b*omega/gamma);
+    double val = alpha*pow( omega ,2)/(pow(M_PI*gamma, 2) )*(pow(K1,2) + pow(K0/gamma,2));
+    return val;
+}
+

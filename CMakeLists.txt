@@ -1,13 +1,8 @@
 cmake_minimum_required(VERSION 3.12)
-project(MyPlotApp)
+project(VectorMesonProduction)
 
 set(CMAKE_CXX_STANDARD 17)
 set(CMAKE_CXX_STANDARD_REQUIRED ON)
-
-# -----------------------------------------------------------------------------
-# Locate Python and NumPy
-# -----------------------------------------------------------------------------
-find_package(Python3 COMPONENTS Interpreter Development NumPy REQUIRED)
 
 # -----------------------------------------------------------------------------
 # Locate GSL
@@ -25,14 +20,22 @@ if(NOT CUBA_LIBRARY OR NOT CUBA_INCLUDE_DIR)
 endif()
 
 # -----------------------------------------------------------------------------
+# Include ROOT
+# -----------------------------------------------------------------------------
+find_package(ROOT REQUIRED)
+
+# Use ROOT's compile flags
+set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} ${ROOT_CXX_FLAGS}")
+
+
+# -----------------------------------------------------------------------------
 # Include directories
 # -----------------------------------------------------------------------------
 include_directories(
     ${PROJECT_SOURCE_DIR}/include
-    ${Python3_INCLUDE_DIRS}
-    ${Python3_NumPy_INCLUDE_DIRS}
     ${GSL_INCLUDE_DIRS}
     ${CUBA_INCLUDE_DIR}
+    ${ROOT_INCLUDE_DIRS}
 )
 
 # -----------------------------------------------------------------------------
@@ -56,6 +59,8 @@ target_link_libraries(VMProduction
     ${Python3_LIBRARIES}
     ${GSL_LIBRARIES}
     ${CUBA_LIBRARY}
+    ${ROOT_LIBRARIES}  
+
     m
     dl
     crypt

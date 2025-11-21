@@ -2,3 +2,5 @@ build/
 *.root
 *.dat
 *.data
+*.grid
+

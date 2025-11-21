@@ -24,19 +24,27 @@ class PhotonFlux {
         double getA(double x);
         double getKniehl(double x);
         double getJackson(double x);
+        double getJackson(double x, double b);
 
+        //helper functions
         double xFromRapidity(double y){ return m_VM * exp(y)/squareRootOfS; }
         double xFromOmega(double omega){ return 2*omega/squareRootOfS; }
+        double getLorentzFactor(){ return pow(squareRootOfS/M_p, 2)/2 - 1; }
+        double omegaFromX(double x){ return squareRootOfS * x / 2; }
+
 
         double getDreesZeppenfeldFromRapidity(double y) { return getDreesZeppenfeld( xFromRapidity(y) ); }
         double getModifiedDZFromRapidity(double y) { return getModifiedDZ( xFromRapidity(y) ); }
         double getKniehlFromRapidity(double y) { return getKniehl( xFromRapidity(y) ); }
         double getJacksonFromRapidity(double y) { return getJackson( xFromRapidity(y) ); }
+        double getJacksonFromRapidity(double y, double b) { return getJackson( xFromRapidity(y), b); }
 
         double getDreesZeppenfeldFromPhotonEnergy(double omega) {double x = xFromOmega(omega); return x > 1 ? 0 : getDreesZeppenfeld(x); }
         double getModifiedDZFromPhotonEnergy(double omega) { double x = xFromOmega(omega); return x > 1 ? 0 : getModifiedDZ(x); }
         double getKniehlFromPhotonEnergy(double omega) { double x = xFromOmega(omega); return x > 1 ? 0 : getKniehl(x); }
         double getJacksonFromPhotonEnergy(double omega) { double x = xFromOmega(omega); return x > 1 ? 0 : getJackson(x); }
+        double getJacksonFromPhotonEnergy(double omega, double b) { double x = xFromOmega(omega); return x > 1 ? 0 : getJackson(x, b); }
+    
     private:
         double squareRootOfS = 510; //GeV
         double m_VM = 3.1;  //GeV

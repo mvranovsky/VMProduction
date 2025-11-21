@@ -1,17 +1,120 @@
-#include "WaveFunction.h"
+#include "DipoleCrossSection.h"
 
-WaveFunction::WaveFunction(string pathToGrid) {
-    mGridName = pathToGrid;
+DipoleCrossSection::DipoleCrossSection(){
+  // Constructor implementation if needed
+  // Initialize any member variables or resources here
 
-    // check if the file is possible to open
-    
+}
 
-} 
-
-WaveFunction::~WaveFunction() {}
+DipoleCrossSection::~DipoleCrossSection() {}
 
 
-GridData WaveFunction::loadGrid(const string gridName, int xN, int yN) {
+
+double DipoleCrossSection::getGBWOld(double r, double x) {
+
+  // according to arXiv:1901.02664v1 [hep-ph] 
+
+  double sigma0 = 23.03;  //mb
+  double x0 = 3.04e-4;
+  double lambda = 0.288; //GeV^-2
+  double Q0Squared = 1; //GeV^2
+
+  double QSSquared = Q0Squared * pow(x/x0, -lambda);
+  return sigma0 * ( 1 - exp(-QSSquared * pow(r, 2) / 4) );
+}
+
+double DipoleCrossSection::getGBWNew(double r, double x) {
+
+  // according to arXiv:1901.02664v1 [hep-ph]
+
+  double sigma0 = 23.9;  //mb
+  double x0 = 1.11e-4;
+  double lambda = 0.287; //GeV^-2
+  double Q0Squared = 1; //GeV^2
+
+  double QSSquared = Q0Squared * pow(x/x0, -lambda);
+  return sigma0 * ( 1 - exp(-QSSquared * pow(r, 2) / (4 * (1 + QSSquared * pow(r, 2)))) );
+}
+
+
+double DipoleCrossSection::getGBWNewNew(double r, double x){
+  // according to code tot_proton.cpp
+
+  double x0= 0.42e-4;
+  double lam = 0.248;
+  double R02 = 1.* pow(x0/x,lam) * pow(GEV2FM,2) *pow(1.-x,5.6);
+  double sigma0 = 27.32 *0.1; // in fm^2
+
+
+  // standard formula     
+  double res = sigma0*(1. - exp(-r*r*R02/4.)); // r in fm, res in fm^2
+  //    double res = sigma0*(1. - exp(-r*r/R02)); 
+  return res;
+
+
+}
+
+double DipoleCrossSection::getKST(double r, double x) // r, sq in fm, Gev^2
+{
+  double s = sFromX(x);
+  double s0 = 1000.; // GeV^2
+  double R02 = pow(0.88 * pow(s/s0, -0.14),2); // fm^2
+  //double B0 = 6.; //GeV-2
+  //double aP = 0.25; //GeV-2
+  //double mu2 = 1; //GeV2
+  double rpi2 = 0.44; // fm^2 
+  //double Bel = B0 + 2.*aP*log(s/mu2);
+  //double RN2 = Bel - 0.25*R02 - (1./3.)*rpi2; 
+  double sigPiPtot = 23.6 * pow(s/s0,0.08) * 0.1 + 1.432 * pow(s/s0, -0.45) * 0.1; // mb -> fm^2
+  double sigma0 = sigPiPtot*(1. + 3.*R02/rpi2/8.);
+  double res = sigma0*(1. - exp(-r*r/R02));
+  // C(s)*r^2 form
+  //    double res1 = sigma0*1./R02 * r*r;
+
+  return res;
+ }
+
+
+double DipoleCrossSection::getGBWDglap( double r, double x) // r in fm
+{
+
+// K. Golec-Biernat, S. Sapeta, JHEP03 (2018), 102, arXiv:1711.11360
+
+//Limits: x in [1e-6, 1e-2], r in [1e-3, 1e4] in GeV^-1, Q2 in [0.065, 700] in GeV^2.
+ //   cout << "input " << r << "\t" << x << endl;
+
+  if (x > 0.01) {
+  x = 0.01;
+  }
+
+  if (r*GEV2FM < 0.001) {
+    r = 0.001/GEV2FM;
+  }
+
+  
+  double res1[1];
+  double xp[2];
+  xp[0] = x;
+  xp[1] = r*GEV2FM;
+
+  if(mGridData.isData == 1) {
+    getData(mGridData, xp, res1);
+  }else {
+    std::cerr << "ERROR: no data loaded - need to call loadGrid()" << std::endl;
+    exit(1);
+  }
+  
+  
+  double sigma0 = 22.93; // mb
+
+  double res = res1[0]*sigma0 * 0.1; // mb -> fm^2
+
+//    cout << "output " <<r << "\t" << x << "\t" << res << endl;
+
+    return res;
+}
+
+GridData DipoleCrossSection::loadGrid(const string gridName, int xN, int yN) {
 
   GridData s;
   s.xDim = xN;
@@ -204,7 +307,7 @@ GridData WaveFunction::loadGrid(const string gridName, int xN, int yN) {
 
 
 
-void WaveFunction::getData(GridData &s, double* xx, double* yy){
+void DipoleCrossSection::getData(GridData &s, double* xx, double* yy){
   
   
   
@@ -329,9 +432,3 @@ void WaveFunction::getData(GridData &s, double* xx, double* yy){
 
 }
   
-
-
-
-
-
-
